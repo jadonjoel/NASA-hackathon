@@ -1,0 +1,66 @@
+/* Years on the surface: a bar chart of each explorer's time on the surface. Bars grow with transform only. */
+.chronicle{background:#0b161a;color:#edf0e4;border-top:1px solid #ffffff20;position:relative;overflow:hidden}
+.chronicle::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 85% 0%,#28413b55,transparent 60%);pointer-events:none}
+.chronicle>*{position:relative}
+.chronicle-head{display:grid;grid-template-columns:1.4fr 1fr;gap:5vw;align-items:end;margin:30px 0 70px}
+.chronicle-head h2{margin:0}
+.chronicle-head p{color:#a8bdb3;font-size:15px;line-height:1.6;max-width:420px;justify-self:end;margin:0}
+.chronicle-axis{position:relative;height:20px;margin-left:250px;font-size:10px;letter-spacing:.1em;color:#7f9489;margin-bottom:10px}
+.chronicle-axis span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.chronicle-rows{list-style:none;padding:0;margin:0;border-bottom:1px solid #ffffff20}
+.chronicle-row{display:grid;grid-template-columns:230px 1fr;column-gap:20px;align-items:center;padding:22px 0;border-top:1px solid #ffffff20}
+.chronicle-name{grid-row:span 2}
+.chronicle-name small{display:block;font-size:9px;letter-spacing:.14em;color:#d9e6b6;margin-bottom:6px}
+.chronicle-name strong{font-weight:400;font-size:clamp(18px,1.8vw,26px);letter-spacing:-.03em}
+.chronicle-track{position:relative;height:14px;border-radius:7px;background:#ffffff10}
+.chronicle-track i{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:7px;background:#d9e6b6;transform-origin:left;transform:scaleX(0);transition:transform 1.3s cubic-bezier(.22,1,.36,1) calc(var(--i,0)*140ms)}
+.chronicle-row.in .chronicle-track i{transform:scaleX(1)}
+.chronicle-row[data-ongoing] .chronicle-track i{background:linear-gradient(90deg,#d9e6b6,#d9e6b680)}
+.chronicle-meta{grid-column:2;display:flex;justify-content:space-between;gap:20px;margin-top:12px;font-size:12px;color:#a8bdb3;letter-spacing:.03em}
+.cm-sil{color:#d9e6b6}
+.chronicle-note{font-size:11px;color:#7f9489;letter-spacing:.06em;margin-top:22px}
+@media(max-width:800px){
+ .chronicle-head{grid-template-columns:1fr;gap:20px}
+ .chronicle-head p{justify-self:start}
+ .chronicle-axis{margin-left:0}
+ .chronicle-row{grid-template-columns:1fr}
+ .chronicle-name{grid-row:auto}
+ .chronicle-meta{grid-column:1;flex-direction:column;gap:4px}
+}
+@media(prefers-reduced-motion:reduce){.chronicle-track i{transition:none;transform:scaleX(1)}}
+
+/* Intro runway: the intro stays pinned while its words light up, so it cannot scroll past quickly. */
+.intro-runway{height:240svh;position:relative}
+.intro-runway>.intro{position:sticky;top:0;height:100svh;min-height:620px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.lit-word{display:inline-block;opacity:.18;transition:opacity .25s linear}
+@media(max-height:700px){.intro-runway{height:auto}.intro-runway>.intro{position:relative;height:auto;min-height:0}}
+
+/* Passive motion for the years chart: a slow drift across the background and a beacon on the ongoing bar. */
+.chronicle::before{animation:chronicle-drift 26s ease-in-out infinite alternate}
+@keyframes chronicle-drift{to{transform:translate3d(-3%,2%,0) scale(1.06)}}
+.chronicle-row[data-ongoing] .chronicle-track i::before{content:"";position:absolute;right:-7px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;border:1px solid #d9e6b6;animation:chronicle-beacon 2.6s ease-out infinite;pointer-events:none}
+.chronicle-row[data-ongoing] .chronicle-track i::after{content:"";position:absolute;right:-5px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:#eef6d6;pointer-events:none}
+@keyframes chronicle-beacon{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
+@media(prefers-reduced-motion:reduce){.chronicle::before,.chronicle-row[data-ongoing] .chronicle-track i::before{animation:none}}
+
+/* Black-and-white backgrounds for the wheel and the presentation, with slow monochrome motion. */
+.orbital-stories,.wheel-ready .orbital-stories{background:#000}
+.wheel-ready .wheel-stage{background:radial-gradient(ellipse at 50% 50%,#161616 0%,#000 70%),#000}
+.story-reel{background:#000}
+.story-reel .reel-bar{background:linear-gradient(transparent,#000 60%)}
+.mono-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:#000}
+.mono-bg svg{position:absolute;left:-25%;top:-25%;width:150%;height:150%;transform-origin:50% 50%;animation:mono-spin 160s linear infinite}
+.mono-bg ellipse{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1.2}
+.mono-bg ellipse:nth-child(even){stroke:rgba(255,255,255,.07)}
+.mono-bg::after{content:"";position:absolute;inset:-70px;background-image:radial-gradient(rgba(255,255,255,.5) 1px,transparent 1.5px);background-size:90px 90px;opacity:.55;animation:mono-drift 70s linear infinite}
+@keyframes mono-spin{to{transform:rotate(360deg)}}
+@keyframes mono-drift{to{transform:translate3d(-90px,-45px,0)}}
+@media(prefers-reduced-motion:reduce){.mono-bg svg,.mono-bg::after{animation:none}}
+.reel-slides,.wheel-present{position:absolute;inset:0;z-index:1}
+
+/* The shared pause control applies to every section added in v8. */
+.is-paused .mono-bg svg,.is-paused .mono-bg::after,.is-paused .chronicle::before,.is-paused .chronicle-track i::before{animation-play-state:paused}
+.is-paused .lit-word{opacity:1!important;transition:none}
+.is-paused .intro-runway{height:auto}
+.is-paused .intro-runway>.intro{position:relative;height:auto;min-height:0}
+@media(prefers-reduced-motion:reduce){.intro-runway{height:auto}.intro-runway>.intro{position:relative;height:auto;min-height:0}.lit-word{opacity:1!important}}

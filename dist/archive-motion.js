@@ -1,0 +1,9 @@
+(()=>{'use strict';
+const archive=document.querySelector('#archive'),buttons=[...archive.querySelectorAll('[data-filter]')],reduce=matchMedia('(prefers-reduced-motion: reduce)');
+const allowed=()=>!reduce.matches&&!window.explorerMotion?.paused;
+function animate(el,frames,options){el.getAnimations().forEach(a=>a.cancel());if(allowed())el.animate(frames,options)}
+function results(){if(!allowed())return;const r=archive.getBoundingClientRect();if(r.top>=innerHeight||r.bottom<=0)return;archive.querySelectorAll('.archive-row').forEach((row,i)=>animate(row,[{opacity:0,transform:'translate3d(0,18px,0)'},{opacity:1,transform:'none'}],{duration:420,delay:i*45,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'}))}
+buttons.forEach(button=>{const orb=document.createElement('span');orb.className='filter-orb';orb.setAttribute('aria-hidden','true');button.prepend(orb);button.addEventListener('click',()=>animate(orb,[{transform:'scale(.65) rotate(-35deg)'},{transform:'scale(1.16) rotate(8deg)',offset:.65},{transform:'scale(1) rotate(0deg)'}],{duration:460,easing:'cubic-bezier(.22,1,.36,1)'}))});
+const observer=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;animate(archive.querySelector('.archive-title'),[{opacity:0,transform:'translateY(28px)'},{opacity:1,transform:'none'}],{duration:650,easing:'cubic-bezier(.22,1,.36,1)'});buttons.forEach((b,i)=>animate(b,[{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:420,delay:120+i*70,fill:'backwards',easing:'ease-out'}));results();observer.disconnect()}),{threshold:.12});observer.observe(archive);
+addEventListener('archiveupdate',results);addEventListener('motionchange',()=>{if(!allowed())archive.getAnimations({subtree:true}).forEach(a=>a.cancel())});reduce.addEventListener('change',()=>{if(!allowed())archive.getAnimations({subtree:true}).forEach(a=>a.cancel())});
+})();
